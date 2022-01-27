@@ -4,14 +4,25 @@ namespace AndrewAndante\PopulateStoryBook\Tasks;
 
 use AndrewAndante\PopulateStoryBook\Factory\RenderablePopulateFactory;
 use DNADesign\Populate\Populate;
+use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\Dev\YamlFixture;
 use Symfony\Component\Yaml\Parser;
 
-class RenderTask extends BuildTask
+class RenderPopulateTask extends BuildTask
 {
+
+    private static $segment = 'RenderPopulateTask';
+
+    protected $title = 'Render Populate for Storybook Task';
+
+    protected $description = <<<TXT
+Pass in a class name and an identifier to return HTML for any given populate data so that you can easily copy-paste
+it into your Storybook Stories. Optionally pass data in via an array if needed.
+TXT;
+
 
     /**
      * @param HTTPRequest $request
@@ -22,6 +33,7 @@ class RenderTask extends BuildTask
         $class = $request->getVar('className');
         $identifier = $request->getVar('id');
         $blueprintData = $request->getVar('data') ?: [];
+        $found = false;
 
         if ($class && $identifier) {
             $parser = new Parser();
@@ -50,14 +62,29 @@ class RenderTask extends BuildTask
                     foreach ($items as $candidateIdentifier => $data) {
                         if ($identifier === $candidateIdentifier) {
                             $blueprintData = array_merge($data, $blueprintData);
+                            $found = true;
                             break 3;
                         }
                     }
                 }
             }
-            echo $factory->renderObject($class, $identifier, $blueprintData);
+            if (!$found) {
+                self::log('No entry found for that class + id combination');
+            } else {
+                self::log($factory->renderObject($class, $identifier, $blueprintData));
+            }
         } else {
-            echo "Needs at least ?className= and ?id=" . PHP_EOL;
+            self::log('Needs at least ?className= and ?id=');
         }
+    }
+
+    protected static function log(string $message)
+    {
+        if (Director::is_cli()) {
+            $newline = "<br />";
+        } else {
+            $newline = PHP_EOL;
+        }
+        echo $message . $newline;
     }
 }
