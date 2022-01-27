@@ -5,6 +5,7 @@ namespace AndrewAndante\PopulateStoryBook\Tasks;
 use DNADesign\Populate\Populate;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Core\Convert;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\Dev\YamlFixture;
@@ -84,10 +85,9 @@ TXT;
     protected static function log(string $message)
     {
         if (Director::is_cli()) {
-            $newline = PHP_EOL;
+            echo $message . PHP_EOL;
         } else {
-            $newline = "<br />";
+            echo "<pre>" . Convert::raw2xml($message) . "</pre><br />";
         }
-        echo $message . $newline;
     }
 }
