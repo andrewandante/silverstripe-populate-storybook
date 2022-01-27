@@ -31,11 +31,38 @@ composer require andrewandante/silverstripe-populate-storybook 4.x-dev
 See [License](license.md)
 
 ## Documentation
- * [Documentation readme](docs/en/readme.md)
 
-Add links into your docs/<language> folder here unless your module only requires minimal documentation
-in that case, add here and remove the docs folder. You might use this as a quick table of content if you
-mhave multiple documentation pages.
+To use this task, run the following command:
+
+```shell
+vendor/bin/sake dev/tasks/RenderPopulateTask
+```
+
+The parameters are:
+
+- className [required]: needs to be set with double-backslashes
+- id [required]: this is the identifier in your populate data
+- data: here you can override what is in the populate fixture if needed
+
+e.g. if you have the following yaml:
+
+```yaml
+App\PageTypes\HomePage:
+  home:
+    Title: Home
+    MenuTitle: Home
+    Content: Home is where the heart is
+```
+
+and run the following command:
+
+```shell
+vendor/bin/sake dev/tasks/RenderPopulateTask className=App\\PageTypes\\HomePage id=home data[Title]=Foo data[MenuTitle]=Bar
+```
+
+It will render the HomePage with reference `home`, substituting in the passed-in data (`Title` and `MenuTitle`) but retaining the value of `Content` in the template.
+
+The task uses `php-tidy` to format the output to 2-space indents.
 
 ## Maintainers
  * Andrew Paxley <andrew.paxley@silverstripe.com>
