@@ -81,9 +81,9 @@ TXT;
     protected static function log(string $message)
     {
         if (Director::is_cli()) {
-            $newline = "<br />";
-        } else {
             $newline = PHP_EOL;
+        } else {
+            $newline = "<br />";
         }
         echo $message . $newline;
     }
