@@ -37,7 +37,6 @@ TXT;
 
         if ($class && $identifier) {
             $parser = new Parser();
-            $factory = Injector::inst()->create(RenderablePopulateFactory::class);
             foreach (Populate::config()->get('include_yaml_fixtures') as $fixtureFile) {
                 $fixture = new YamlFixture($fixtureFile);
                 if (!empty($fixture->getFixtureString())) {
@@ -71,7 +70,8 @@ TXT;
             if (!$found) {
                 self::log('No entry found for that class + id combination');
             } else {
-                self::log($factory->renderObject($class, $identifier, $blueprintData));
+                $object = Injector::inst()->create($class);
+                self::log($object->renderWith($object->getViewerTemplates(), $blueprintData));
             }
         } else {
             self::log('Needs at least ?className= and ?id=');
