@@ -2,13 +2,13 @@
 
 namespace AndrewAndante\PopulateStoryBook\Tasks;
 
-use AndrewAndante\PopulateStoryBook\Factory\RenderablePopulateFactory;
 use DNADesign\Populate\Populate;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\Dev\YamlFixture;
+use SilverStripe\View\Parsers\TidyHTMLCleaner;
 use Symfony\Component\Yaml\Parser;
 
 class RenderPopulateTask extends BuildTask
@@ -71,7 +71,10 @@ TXT;
                 self::log('No entry found for that class + id combination');
             } else {
                 $object = Injector::inst()->create($class);
-                self::log($object->renderWith($object->getViewerTemplates(), $blueprintData));
+                $tidy = new TidyHTMLCleaner();
+                $defaultConfig = $tidy->getConfig();
+                $tidy->setConfig(array_merge($defaultConfig, ['indent' => 2]));
+                self::log($tidy->cleanHTML($object->renderWith($object->getViewerTemplates(), $blueprintData)));
             }
         } else {
             self::log('Needs at least ?className= and ?id=');
